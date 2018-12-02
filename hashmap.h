@@ -2,23 +2,25 @@
 #define HASHMAP_H
 
 struct llnode {
-        char* word;
-        char* document_id;
-        int num_occurrences;
-        struct llnode* next;
+    char* word;
+    int D1count;
+    int D2count;
+    int D3count;
+    struct llnode* next;
 };
 
 struct hashmap {
-        struct llnode** map;
-        int num_buckets;
-        int num_elements;
+    struct llnode** map;
+    int num_buckets;
+    int num_elements;
 };
 
 struct hashmap* hm_create(int num_buckets);
-int hm_get(struct hashmap* hm, char* word, char* document_id);
-void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrences);
+void hm_initBucket(struct hashmap* hm, int index);
+struct llnode* hm_get(struct hashmap* hm, char* word, char* document_id);
+void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3);
 void hm_destroy(struct hashmap* hm);
-int hash(struct hashmap* hm, char* word, char* document_id);
+int hash(struct hashmap* hm, char* word);
 void hm_remove(struct hashmap* hm, char* word, char* document_id);
 
 #endif

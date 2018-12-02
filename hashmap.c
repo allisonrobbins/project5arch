@@ -9,80 +9,102 @@ struct hashmap* hm_create(int num_buckets)
     hm->map = (struct llnode**)calloc(num_buckets,sizeof(struct llnode));
     hm->num_buckets = num_buckets;
     hm->num_elements = 0;
+    int i;
+    for(i=0; i<num_buckets; i++)
+    {
+        hm_initBucket(hm,i);//calling this method makes all the buckets empty, then they can point to nodes
+    }
     return hm;
 }
-int hm_get(struct hashmap* hm, char* word, char* document_id)
+void hm_initBucket(struct hashmap* hm, int index)
 {
-  //printf("Made it to get method\n");  
-  int bucket = hash(hm,word,document_id);
-    struct llnode* top = hm->map[bucket];
-    if(top == NULL)
+    struct llnode* temp = hm->map[index];
+    temp->word = NULL;
+    temp->D1count = 0;
+    temp->D2count = 0;
+    temp->D3count = 0;
+    temp->next = NULL;
+}
+struct llnode* hm_get(struct hashmap* hm, char* word)
+{
+    int bucket = hash(hm,word);
+    struct llnode* head = hm->map[bucket];
+    struct llnode* iter = head;
+    if (iter->next = NULL)
     {
-      printf("there is nothing in bucket %i\n",bucket);
-      printf("the number of occurrences for %s %s is 0. Returning -1.\n",word,document_id);
-      return -1;
+        return iter;//return a null node
     }
-    //printf("bucket %i is not empty\n",bucket);
-    struct llnode* iter = top;
     while(iter->next != NULL)
     {
-      if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)
-      {
-        printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
-        return iter->num_occurrences;//if they match, return the number of occurrences
-      }
-      iter = iter->next;
+        if(iter->word == word)
+        {
+            return iter;
+        }
     }
-    if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)
-      {
-        printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
-        return iter->num_occurrences;//if they match, return the number of occurrences
-      }
-    printf("the number of occurrences for %s %s is 0. Returning -1.\n",word,document_id);
-    return -1;
+    if(iter->word == word)
+    {
+        return iter;
+    }
+    else
+    {
+        return head;//head is null, so if the word is not found, return a null node
+    }
 }
 /* This method takes a given word-document pair and updates the num_occurrences if it exists
 *  or it creates a new llnode for that pair and inputs the num_occurrences there
 */
-void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrences){
-    int bucket = hash(hm,word,document_id);
-    struct llnode *headBucket = hm->map[bucket];
-  //printf("head node is %s %s\n", headBucket->word,headBucket->document_id);
-    if (headBucket==NULL) 
-  {
-        printf("nothing in the bucket yet\n");
-        struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
-        printf("allocated space for new node\n");
-        hm->map[bucket] = new_node;
-        new_node->word = word;
-        new_node->document_id = document_id;
-        new_node->num_occurrences = num_occurrences;
-        printf("Adding word: %s doc: %s to bucket %i\n",new_node->word,new_node->document_id,bucket);
-        hm->num_elements += 1;
+void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
+{
+    int bucket = hash(hm,word);
+    struct llnode* head = hm->map[bucket];
+    struct llnode* iter = head;
+    if(iter->next = NULL)//first node in the bucket
+    {
+        struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
+        newNode->word = word;
+        newNode->D1count += D1;
+        newNode->D2count += D2;
+        newNode->D3count += D3;
+        newNode->next = NULL;
+        iter->next = newNode;
+        hm->num_elements++;
+        return;
     }
-    else {
-        struct llnode* curr = headBucket;
-        struct llnode* prev = headBucket;
-        while (curr != 0) {
-            if (strcmp(curr->word, word) == 0 && strcmp(curr->document_id, document_id) == 0) {
-                curr->num_occurrences += num_occurrences;
-                printf("after update, number of occur in hm_put: %s %d\n", word, curr->num_occurrences);
+    else
+    {
+        iter = iter->next;
+        while(iter->next != NULL)
+        {
+            if (strcmp(iter->word, word) == 0)//word already has a bucket in the hashmap
+            {
+                iter->D1count +=D1;
+                iter->D2count += D2;
+                iter->D3count += D3;
                 return;
             }
-            prev = curr;
-            curr = curr->next;
+            iter = iter->next;
         }
-        /* Add node to end of list */
-    printf("adding to the end of bucket %i\n",bucket);
-        struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
-        new_node->word = word;
-        new_node->document_id = document_id;
-        new_node->num_occurrences = num_occurrences;
-        prev->next = new_node;
-        hm->num_elements += 1;
+        if (strcmp(iter->word, word) == 0)//word already has a bucket in the hashmap
+        {
+            iter->D1count +=D1;
+            iter->D2count += D2;
+            iter->D3count += D3;
+            return;
+        }
+        else
+        {
+            struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
+            newNode->word = word;
+            newNode->D1count += D1;
+            newNode->D2count += D2;
+            newNode->D3count += D3;
+            newNode->next = NULL;
+            iter->next = newNode;
+            hm->num_elements++;
+            return;
+        }
     }
 }
-
 int hash(struct hashmap* hm, char* word, char* document_id)
 {
     char* a;
