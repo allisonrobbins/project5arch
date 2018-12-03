@@ -30,7 +30,7 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
     int bucket = hash(hm,word);
     struct llnode* head = hm->map[bucket];
     struct llnode* iter = head;
-    if (iter->next = NULL)
+    if (iter->next == NULL)
     {
         return iter;//return a null node
     }
@@ -47,16 +47,25 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
     }
     else
     {
-        return head;//head is null, so if the word is not found, return a null node
+        return iter;//head is null, so if the word is not found, return a null node
     }
 }
-/* This method takes a given word-document pair and updates the num_occurrences if it exists
-*  or it creates a new llnode for that pair and inputs the num_occurrences there
-*/
+
 void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
 {
-    struct llnode* temp = get(hm,word);
+    struct llnode* temp = hm_get(hm,word);
     if(temp->word == NULL)//doesnt work at the end of list
+    {
+        struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
+        newNode->word = word;
+        newNode->D1count = D1;
+        newNode->D2count = D2;
+        newNode->D3count = D3;
+        newNode->next = NULL;
+        temp->next = newNode;
+        hm->num_elements++;
+    }
+    else if(strcmp(temp->word,word)==0)
     {
         struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
         newNode->word = word;
@@ -69,24 +78,22 @@ void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
     }
     else
     {
-        temp->D1 += D1;
-        temp->D2 += D2;
-        temp->D3 += D3;
+        temp->D1count += D1;
+        temp->D2count += D2;
+        temp->D3count += D3;
     }
 }
-int hash(struct hashmap* hm, char* word, char* document_id)
+int hash(struct hashmap* hm, char* word)
 {
     char* a;
     int i;
     int sum = 0;
-    char* getRidOfDumbError = document_id;
     for(a = word; *a!='\0'; a++)
     {
       i = (int) *a;
       sum = sum + i;
     }
     sum = sum%hm->num_buckets;
-    getRidOfDumbError++;
     return sum;
 }
 void hm_destroy(struct hashmap* hm)
@@ -112,7 +119,7 @@ void hm_destroy(struct hashmap* hm)
     free(hm->map);
     free(hm);
 }
-void hm_remove(struct hashmap* hm, char* word, char* document_id)
+/*void hm_remove(struct hashmap* hm, char* word)
 {
   int bucket = hash(hm,word,document_id);
   struct llnode* headBucket = hm->map[bucket];
@@ -157,3 +164,4 @@ void hm_remove(struct hashmap* hm, char* word, char* document_id)
   }
   printf("reached end of list, key value pair not found.\n");
 }
+*/
