@@ -55,54 +55,23 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
 */
 void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
 {
-    int bucket = hash(hm,word);
-    struct llnode* head = hm->map[bucket];
-    struct llnode* iter = head;
-    if(iter->next = NULL)//first node in the bucket
+    struct llnode* temp = get(hm,word);
+    if(temp->word == NULL)//doesnt work at the end of list
     {
         struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
         newNode->word = word;
-        newNode->D1count += D1;
-        newNode->D2count += D2;
-        newNode->D3count += D3;
+        newNode->D1count = D1;
+        newNode->D2count = D2;
+        newNode->D3count = D3;
         newNode->next = NULL;
-        iter->next = newNode;
+        temp->next = newNode;
         hm->num_elements++;
-        return;
     }
     else
     {
-        iter = iter->next;
-        while(iter->next != NULL)
-        {
-            if (strcmp(iter->word, word) == 0)//word already has a bucket in the hashmap
-            {
-                iter->D1count +=D1;
-                iter->D2count += D2;
-                iter->D3count += D3;
-                return;
-            }
-            iter = iter->next;
-        }
-        if (strcmp(iter->word, word) == 0)//word already has a bucket in the hashmap
-        {
-            iter->D1count +=D1;
-            iter->D2count += D2;
-            iter->D3count += D3;
-            return;
-        }
-        else
-        {
-            struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
-            newNode->word = word;
-            newNode->D1count += D1;
-            newNode->D2count += D2;
-            newNode->D3count += D3;
-            newNode->next = NULL;
-            iter->next = newNode;
-            hm->num_elements++;
-            return;
-        }
+        temp->D1 += D1;
+        temp->D2 += D2;
+        temp->D3 += D3;
     }
 }
 int hash(struct hashmap* hm, char* word, char* document_id)

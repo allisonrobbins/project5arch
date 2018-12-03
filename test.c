@@ -4,73 +4,72 @@
 #include "hashmap.h"
 
 
-void readFile(char* input_file, struct hashmap *hm);
-void hm_print(struct hashmap* hm);
-void readFile(char* input_file,struct hashmap *hm)
+void readFiles(struct hashmap *hm);
+void readFiles(struct hashmap* hm)
 {
-  printf("reading file %s\n",input_file);
-  FILE *fptr;
-  char line[256];
-  char* word;
-  fptr = fopen(input_file, "r");
-  if(fptr == NULL)
-  {
-    return;
-  }
-  fgets(line,256,fptr);
-  word = strtok(line, " ");
-  while(word!=NULL)
-  {
-    hm_put(hm,word,input_file,1);
-    word = strtok(NULL, " ");
-  }
-  fclose(fptr);
+    FILE *fptr;
+    char line[256];
+    char* word;
+    fptr = fopen("D1.txt", "r");//open file 1
+    if(fptr == NULL)
+    {
+        return;
+    }
+    fgets(line,256,fptr);
+    word = strtok(line, " ");
+    while(1)//the loop to read file D1.txt into the hashmap
+    {
+        if(word == NULL)
+        {
+            break;
+        }
+        hm_put(hm,word,1,0,0);
+        char* word = strtok(NULL," ");
+    }
+    fclose(fptr);//close file 1
+    fptr = fopen("D2.txt", "r");//open file 2
+    if(fptr == NULL)
+    {
+        return;
+    }
+    fgets(line,256,fptr);
+    word = strtok(line, " ");
+    while(1)//the loop to read file D2.txt into the hashmap
+    {
+        if(word == NULL)
+        {
+            break;
+        }
+        hm_put(hm,word,0,1,0);
+        char* word = strtok(NULL," ");
+    }
+    fclose(fptr);//close file 2
+    fptr = fopen("D3.txt", "r");//open file 3
+    if(fptr == NULL)
+    {
+        return;
+    }
+    fgets(line,256,fptr);
+    word = strtok(line, " ");
+    while(1)//the loop to read D3 into the hashmap
+    {
+        if(word == NULL)
+        {
+            break;
+        }
+        hm_put(hm,word,0,0,1);
+        char* word = strtok(NULL," ");
+    }
+    fclose(fptr);
 }
 
-void hm_print(struct hashmap* hm)
-{
-  int i;
-  struct llnode* iter;
-  printf("printing hashmap\n");
-  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-  for(i=0; i<hm->num_buckets; i++)
-  {
-    iter = hm->map[i];
-    printf("Bucket number %i:\n",i);
-    printf("\n");
-    if(iter==NULL)
-    {
-      printf("There is nothing in the bucket\n");
-      printf("\n");
-    }
-    while(iter!=NULL)
-    {
-      printf("Word = %s, Document ID = %s, Number of Occurrences = %i\n",iter->word,iter->document_id,iter->num_occurrences);
-      iter = iter->next;
-    }
-    printf("\n");
-    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-  }
-}
 int main(void)
 {
-  printf("___________________________________________________________\n");
-  printf("Create the hashmap and input files:\n");
-  struct hashmap *hm = hm_create(23);
-  printf("I made a hashmap\n");
-  readFile("input1.txt",hm);
-  readFile("input2.txt",hm);
-  readFile("input3.txt",hm);
-  hm_print(hm);
-  printf("___________________________________________________________\n");
-  printf("Test get ~you~ from input2.txt (should be 6): %d\n", hm_get(hm, "you", "input2"));
-	hm_remove(hm, "you", "input2");
-	printf("After remove: test get \"homework\" from D3.txt (should be -1): %d\n", hm_get(hm, "you", "input2"));
-	printf("After remove: \"homework\" -> num_elements: %d\n", hm->num_elements);
-printf("___________________________________________________________\n");
-	hm_destroy(hm);
-  printf("\n");
-  printf("___________________________________________________________\n");
-
+    printf("___________________________________________________________\n");
+    printf("Create the hashmap and input files:\n");
+    struct hashmap *hm = hm_create(23);
+    printf("I made a hashmap\n");
+    readFiles(hm);
+    printf("___________________________________________________________\n");
 }
 
