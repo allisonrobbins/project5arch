@@ -4,6 +4,7 @@
 #include "hashmap.h"
 
 void training(struct hashmap *hm);
+void read_query();
 void training(struct hashmap* hm)
 {
     printf("made it here");
@@ -60,7 +61,13 @@ void training(struct hashmap* hm)
     }
     fclose(fptr);
 }
-
+void read_query()
+{
+    printf("Enter a string you want to search for, then press enter:\n");
+    char* input;
+    scanf("%s",input);
+    printf("You enter)
+}
 int main(void)
 {
     printf("Enter the number of buckets you want the hashmap to have: \n");
