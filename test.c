@@ -76,7 +76,6 @@ void read_query(struct hashmap *hm)
         printf("%s",ugh->word);
         word = strtok(NULL, " ");
     }
-    
 }
 int main(void)
 {
@@ -88,16 +87,23 @@ int main(void)
     //training(hm);
     while(1)
     {
-        printf("Enter S to search and X to exit: \n");
+        printf("Type S to search or X to exit, then press enter: \n");
         char choice;
-        scanf("%c", &choice);
-        if(choice == 'S')
+        choice = getchar();
+        printf("You entered: ");
+        putchar(choice);
+        printf("\n");
+        if(choice == 'S'||choice == 's')
         {
             read_query(hm);
         }
-        else if(choice == 'X')
+        else if(choice == 'X'||choice == 'x')
         {
             break;
+        }
+        else
+        {
+            printf("Error: that char was invalid. \n");
         }
     }
     training(hm);
