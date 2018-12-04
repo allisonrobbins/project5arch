@@ -21,6 +21,6 @@ struct llnode* hm_get(struct hashmap* hm, char* word);
 void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3);
 void hm_destroy(struct hashmap* hm);
 int hash(struct hashmap* hm, char* word);
-//void hm_remove(struct hashmap* hm, char* word);
+void hm_remove(struct hashmap* hm, char* word);
 
 #endif

@@ -11,9 +11,9 @@ struct hashmap* hm_create(int num_buckets)
     hm->num_elements = 0;
     //int i;
     /*for(i=0; i<num_buckets; i++)
-    {
-        hm_initBucket(hm,i);//calling this method makes all the buckets empty, then they can point to nodes
-    }*/
+     {
+     hm_initBucket(hm,i);//calling this method makes all the buckets empty, then they can point to nodes
+     }*/
     return hm;
 }
 void hm_initBucket(struct hashmap* hm, int index)
@@ -90,8 +90,8 @@ int hash(struct hashmap* hm, char* word)
     int sum = 0;
     for(a = word; *a!='\0'; a++)
     {
-      i = (int) *a;
-      sum = sum + i;
+        i = (int) *a;
+        sum = sum + i;
     }
     sum = sum%hm->num_buckets;
     return sum;
@@ -101,67 +101,66 @@ void hm_destroy(struct hashmap* hm)
     int i;
     for(i=0; i<hm->num_buckets; i++)
     {
-      printf("destroying bucket %i\n",i);
+        printf("destroying bucket %i\n",i);
         struct llnode* trail;
         struct llnode* iter = hm->map[i];
         while(iter != NULL && iter !=0)
         {
-          trail = iter;
-          iter = iter->next;
-          free(trail);
+            trail = iter;
+            iter = iter->next;
+            free(trail);
         }
         if(iter == NULL)
         {
-          printf("iter is null\n");
+            printf("iter is null\n");
         }
     }
     printf("destroying map and hm");
     free(hm->map);
     free(hm);
 }
-/*void hm_remove(struct hashmap* hm, char* word)
-{
-  int bucket = hash(hm,word,document_id);
-  struct llnode* headBucket = hm->map[bucket];
-  if(headBucket == NULL)
-  {
-    printf("key value pair not found\n");
-  }
-  struct llnode* trail = headBucket;
-  struct llnode* iter = headBucket->next;
-  //removing the only node in a bucket...
-  if(iter == NULL && strcmp(trail->word,word)==0 && strcmp(trail->document_id,document_id)==0)
-  {
-    hm->map[bucket]=NULL;
-    free(headBucket);
-    hm->num_elements--;
-    return;
-  }
-  //if the node to be deleted is a head node (1st in the bucket)...
-  else if(strcmp(trail->word,word)==0 && strcmp(trail->document_id,document_id)==0)
-  {
-    trail->next = NULL;
-    free(trail);
-    hm->map[bucket] = iter;
-    hm->num_elements--;
-    return;
-  }
-  //checking the rest of the list to find matching key value pair
-  while(iter != NULL)
-  {
-    if(strcmp(iter->word,word)==0 && strcmp(iter->document_id,document_id)==0)
-    {
-      trail->next = iter->next;
-      iter->next = NULL;
-      free(iter);
-      hm->num_elements--;
-      return;
-    }
-    else{
-      iter = iter->next;
-      trail = trail->next;
-    }
-  }
-  printf("reached end of list, key value pair not found.\n");
-}
-*/
+void hm_remove(struct hashmap* hm, char* word)
+ {
+ int bucket = hash(hm,word);
+ struct llnode* headBucket = hm->map[bucket];
+ if(headBucket == NULL)
+ {
+     printf("key value pair not found\n");
+ }
+ struct llnode* trail = headBucket;
+ struct llnode* iter = headBucket->next;
+ //removing the only node in a bucket...
+ if(iter == NULL && strcmp(trail->word,word)==0)
+ {
+     hm->map[bucket]=NULL;
+     free(headBucket);
+     hm->num_elements--;
+     return;
+ }
+ //if the node to be deleted is a head node (1st in the bucket)...
+ else if(strcmp(trail->word,word)==0)
+ {
+     trail->next = NULL;
+     free(trail);
+     hm->map[bucket] = iter;
+     hm->num_elements--;
+     return;
+ }
+ //checking the rest of the list to find matching key value pair
+ while(iter != NULL)
+ {
+     if(strcmp(iter->word,word)==0)
+     {
+         trail->next = iter->next;
+         iter->next = NULL;
+         free(iter);
+         hm->num_elements--;
+         return;
+     }
+     else{
+         iter = iter->next;
+         trail = trail->next;
+     }
+ }
+ printf("reached end of list, key value pair not found.\n");
+ }

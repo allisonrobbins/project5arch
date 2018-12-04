@@ -4,7 +4,7 @@
 #include "hashmap.h"
 
 void training(struct hashmap *hm);
-void read_query();
+void read_query(struct hashmap *hm);
 void training(struct hashmap* hm)
 {
     printf("made it here");
@@ -61,12 +61,22 @@ void training(struct hashmap* hm)
     }
     fclose(fptr);
 }
-void read_query()
+void read_query(struct hashmap *hm)
 {
     printf("Enter a string you want to search for, then press enter:\n");
-    char* input;
-    scanf("%s",input);
-    printf("You enter)
+    char input[256];
+    scanf("\n");
+    fgets(input, 256, stdin);
+    printf("You entered %s\n",input);
+    char* word;
+    word = strtok(input," ");
+    while(word!=NULL)
+    {
+        struct llnode* ugh = hm_get(hm,word);
+        printf("%s",ugh->word);
+        word = strtok(NULL, " ");
+    }
+    
 }
 int main(void)
 {
@@ -83,7 +93,7 @@ int main(void)
         scanf("%c", &choice);
         if(choice == 'S')
         {
-            //read_query();
+            read_query(hm);
         }
         else if(choice == 'X')
         {
