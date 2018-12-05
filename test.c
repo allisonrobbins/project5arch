@@ -88,8 +88,16 @@ int main(void)
     scanf("%i", &numBuckets);
     struct hashmap *hm = hm_create(numBuckets);
     printf("created hashmap of size %i\n",numBuckets);
+    printf("putting help in bucket\n");
     hm_put(hm,"help",1,0,1);
-    hm_get(hm,"help");
+    printf("put help in bucket, now getting help\n");
+    struct llnode* ugh = hm_get(hm,"help");
+    printf("get result- word: %s D1: %i\n", ugh->word,ugh->D1count);
+    printf("putting help in bucket\n");
+    hm_put(hm,"help",1,0,1);
+    ugh = hm_get(hm,"help");
+    printf("get result- word: %s D1: %i\n", ugh->word,ugh->D1count);
+    exit(0);
     //training(hm);
     while(1)
     {

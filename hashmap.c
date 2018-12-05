@@ -5,25 +5,16 @@
 
 struct hashmap* hm_create(int num_buckets)
 {
-    struct hashmap* hm = (struct hashmap*)calloc(1,sizeof(struct hashmap));
-    hm->map = (struct llnode**)calloc(num_buckets,sizeof(struct llnode));
-    hm->num_buckets = num_buckets;
-    hm->num_elements = 0;
-/*    int i;
+    struct hashmap* hm = (struct hashmap*)malloc(sizeof(struct hashmap));
+    hm->map = (struct llnode**)malloc(sizeof(struct llnode*)*num_buckets);
+    int i;
     for(i=0; i<num_buckets; i++)
     {
-     hm_initBucket(hm,i);//calling this method makes all the buckets empty, then they can point to nodes
-    }*/
+      hm->map[i] = (struct llnode*)malloc(sizeof(struct llnode));
+    }
+    hm->num_buckets = num_buckets;
+    hm->num_elements = 0;
     return hm;
-}
-void hm_initBucket(struct hashmap* hm, int index)
-{
-    struct llnode* temp = hm->map[index];
-    temp->word = "null";
-    temp->D1count = 0;
-    temp->D2count = 0;
-    temp->D3count = 0;
-    temp->next = NULL;
 }
 struct llnode* hm_get(struct hashmap* hm, char* word)
 {
@@ -36,12 +27,12 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
     }
     while(iter->next != NULL)
     {
-        if(iter->word == word)
+        if(strcmp(iter->word, word)==0)
         {
             return iter;
         }
     }
-    if(iter->word == word)
+    if(strcmp(iter->word, word)==0)
     {
         return iter;
     }
@@ -53,34 +44,27 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
 
 void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
 {
-    //struct llnode* temp = hm_get(hm,word);
-    int bucket = hash(hm,word);
-    struct llnode* temp = hm->map[bucket];
-    if(temp == NULL)//doesnt work at the end of list
+    struct llnode* test = hm_get(hm,word);
+    printf("searching for help returned node %s\n",test->word);
+    if(test->word == NULL)
     {
-        temp->word = word;
-        temp->D1count = D1;
-        temp->D2count = D2;
-        temp->D3count = D3;
-        temp->next = NULL;
-        hm->num_elements++;
+      test->word = word;
+      test->D1count = D1;
+      test->D2count = D2;
+      test->D3count = D3;
+      test->next = NULL;
+      hm->num_elements++;
+      return;
     }
-    else if(strcmp(temp->word,word)==0)
+    while(test->next != NULL)
     {
-        struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
-        temp->next = newNode;
-        newNode->word = word;
-        newNode->D1count = D1;
-        newNode->D2count = D2;
-        newNode->D3count = D3;
-        newNode->next = NULL;
-        hm->num_elements++;
-    }
-    else
-    {
-        temp->D1count += D1;
-        temp->D2count += D2;
-        temp->D3count += D3;
+        if(strcmp(test->word, word)==0)
+        {
+          test->D1count += D1;
+          test->D2count += D2;
+          test->D3count += D3;
+          return;
+        }
     }
 }
 int hash(struct hashmap* hm, char* word)
