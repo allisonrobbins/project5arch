@@ -57,12 +57,12 @@ void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
     if(temp == NULL)//doesnt work at the end of list
     {
         struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
+        temp->next = newNode;
         newNode->word = word;
         newNode->D1count = D1;
         newNode->D2count = D2;
         newNode->D3count = D3;
         newNode->next = NULL;
-        temp->next = newNode;
         hm->num_elements++;
     }
     else if(strcmp(temp->word,word)==0)
