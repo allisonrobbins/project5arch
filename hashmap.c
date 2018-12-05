@@ -54,7 +54,7 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
 void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
 {
     struct llnode* temp = hm_get(hm,word);
-    if(temp->word == NULL)//doesnt work at the end of list
+    if(temp == NULL)//doesnt work at the end of list
     {
         struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
         newNode->word = word;
