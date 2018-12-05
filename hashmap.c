@@ -53,7 +53,9 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
 
 void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
 {
-    struct llnode* temp = hm_get(hm,word);
+    //struct llnode* temp = hm_get(hm,word);
+    int bucket = hash(hm,word);
+    struct llnode* temp = hm->map[bucket];
     if(temp == NULL)//doesnt work at the end of list
     {
         temp->word = word;
