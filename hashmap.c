@@ -19,7 +19,7 @@ struct hashmap* hm_create(int num_buckets)
 void hm_initBucket(struct hashmap* hm, int index)
 {
     struct llnode* temp = hm->map[index];
-    temp->word = NULL;
+    temp->word = "null";
     temp->D1count = 0;
     temp->D2count = 0;
     temp->D3count = 0;
@@ -68,12 +68,12 @@ void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
     else if(strcmp(temp->word,word)==0)
     {
         struct llnode* newNode = (struct llnode*)calloc(1,sizeof(struct llnode));
+        temp->next = newNode;
         newNode->word = word;
         newNode->D1count = D1;
         newNode->D2count = D2;
         newNode->D3count = D3;
         newNode->next = NULL;
-        temp->next = newNode;
         hm->num_elements++;
     }
     else
