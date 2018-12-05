@@ -73,8 +73,12 @@ void read_query(struct hashmap *hm)
     while(word!=NULL)
     {
         struct llnode* ugh = hm_get(hm,word);
-        printf("%s",ugh->word);
-        word = strtok(NULL, " ");
+	if(ugh!=NULL)
+
+	{
+       		 printf("%s",ugh->word);
+        }
+	word = strtok(NULL, " ");
     }
 }
 int main(void)

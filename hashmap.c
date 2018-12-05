@@ -9,11 +9,11 @@ struct hashmap* hm_create(int num_buckets)
     hm->map = (struct llnode**)calloc(num_buckets,sizeof(struct llnode));
     hm->num_buckets = num_buckets;
     hm->num_elements = 0;
-    int i;
+/*    int i;
     for(i=0; i<num_buckets; i++)
     {
      hm_initBucket(hm,i);//calling this method makes all the buckets empty, then they can point to nodes
-    }
+    }*/
     return hm;
 }
 void hm_initBucket(struct hashmap* hm, int index)
