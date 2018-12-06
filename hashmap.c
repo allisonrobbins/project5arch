@@ -58,7 +58,7 @@ void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
     }
     while(test->next != NULL)
     {
-        if(test->word!=NULL && strcmp(test->word, word)==0)
+        if(test->word == word)
         {
           test->D1count += D1;
           test->D2count += D2;
