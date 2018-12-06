@@ -94,6 +94,8 @@ int main(void)
   hm_put(hm,"me",1,0,1);
   printf("putting aaaaaaa in bucket\n");
   hm_put(hm,"aaaaaa",1,0,1);
+  struct llnode* ret = hm_get(hm,"help");
+  printf("%s %i %i %i\n",ret->word, ret->D1count, ret->D2count, ret->D3count);
     /*printf("Enter the number of buckets you want the hashmap to have: \n");
     int numBuckets;
     scanf("%i", &numBuckets);

@@ -19,28 +19,21 @@ struct hashmap* hm_create(int num_buckets)
 }
 struct llnode* hm_get(struct hashmap* hm, char* word)
 {
-    int bucket = hash(hm,word);
-    struct llnode* head = hm->map[bucket];
-    struct llnode* iter = head;
-    if (iter == NULL)
-    {
-        return iter;//return a null node
-    }
-    while(iter->next != NULL)
-    {
-        if(strcmp(iter->word, word)==0)
-        {
-            return iter;
-        }
-    }
-    if(strcmp(iter->word, word)==0)
-    {
-        return iter;
-    }
-    else
-    {
-        return iter;//head is null, so if the word is not found, return a null node
-    }
+  int bucket = hash(hm,word);
+  struct llnode* head = hm->map[bucket];
+  struct llnode* iter = head;
+  if (iter == NULL)
+  {
+      return iter;//return a null node
+  }
+  if(strcmp(iter->word, word)==0)
+  {
+      return iter;
+  }
+  else
+  {
+      return iter;//head is null, so if the word is not found, return a null node
+  }
 }
   void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
 	{
