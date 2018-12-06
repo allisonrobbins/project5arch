@@ -83,7 +83,18 @@ void read_query(struct hashmap *hm)
 }
 int main(void)
 {
-    printf("Enter the number of buckets you want the hashmap to have: \n");
+  int numBuckets = 3;
+  struct hashmap *hm = hm_create(numBuckets);
+  training(hm);
+  printf("putting help in bucket\n");
+  hm_put(hm,"help",1,0,1);
+  printf("putting help in bucket\n");
+  hm_put(hm,"help",1,0,1);
+  printf("putting me in bucket\n");
+  hm_put(hm,"me",1,0,1);
+  printf("putting aaaaaaa in bucket\n");
+  hm_put(hm,"aaaaaa",1,0,1);
+    /*printf("Enter the number of buckets you want the hashmap to have: \n");
     int numBuckets;
     scanf("%i", &numBuckets);
     struct hashmap *hm = hm_create(numBuckets);
@@ -122,7 +133,7 @@ int main(void)
     }
     training(hm);
 
-    /*
+
     printf("___________________________________________________________\n");
     printf("Create the hashmap and input files:\n");
     struct hashmap *hm = hm_create(23);

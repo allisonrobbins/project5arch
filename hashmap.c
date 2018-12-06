@@ -11,6 +11,7 @@ struct hashmap* hm_create(int num_buckets)
     for(i=0; i<num_buckets; i++)
     {
       hm->map[i] = (struct llnode*)malloc(sizeof(struct llnode));
+      hm->map[i]->word = "null";
     }
     hm->num_buckets = num_buckets;
     hm->num_elements = 0;
@@ -41,32 +42,44 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
         return iter;//head is null, so if the word is not found, return a null node
     }
 }
-
-void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
-{
-    struct llnode* test = hm_get(hm,word);
-    printf("searching for help returned node %s\n",test->word);
-    if(test->word == NULL)
-    {
-      test->word = word;
-      test->D1count = D1;
-      test->D2count = D2;
-      test->D3count = D3;
-      test->next = NULL;
-      hm->num_elements++;
-      return;
-    }
-    while(test->next != NULL)
-    {
-        if(test->word == word)
-        {
-          test->D1count += D1;
-          test->D2count += D2;
-          test->D3count += D3;
-          return;
-        }
-    }
-}
+  void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
+	{
+	    int bucket = hash(hm,word);
+	    struct llnode* test = hm->map[bucket];
+	    if(strcmp(test->word,"null")==0)
+	    {
+	      test->word = word;
+	      test->D1count = D1;
+	      test->D2count = D2;
+	      test->D3count = D3;
+	      test->next = NULL;
+	      hm->num_elements++;
+	      return;
+	    }
+	    while(test->word!=NULL)
+	    {
+	        if(strcmp(test->word, word)==0)
+	        {
+	          test->D1count += D1;
+	          test->D2count += D2;
+	          test->D3count += D3;
+	          return;
+	        }
+	        if(test->next == NULL)
+	        {
+	          test->next=(struct llnode*)malloc(sizeof(struct llnode));
+	          test = test->next;
+	          test->word = word;
+	          test->D1count = D1;
+	          test->D2count = D2;
+            test->D3count = D3;
+	          test->next = NULL;
+	          hm->num_elements++;
+	          return;
+	        }
+	        test = test->next;
+	    }
+	}
 int hash(struct hashmap* hm, char* word)
 {
     char* a;
