@@ -1,10 +1,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 #include "hashmap.h"
 
 void training(struct hashmap *hm);
 void read_query(struct hashmap *hm);
+void stop_words(struct hashmap *hm);
+double findInvDocFreq(struct llnode* a);
+double tf_idf(struct llnode* a, int docNum);
+int findDocFreq(struct llnode* a);
+void rank(struct llnode* ugh, double R1, double R2, double R3);
+void sort(double R1, double R2, double R3);
 void training(struct hashmap* hm)
 {
     printf("made it here");
@@ -61,85 +68,164 @@ void training(struct hashmap* hm)
     }
     fclose(fptr);
 }
+void stop_words(struct hashmap *hm)
+{
+  int i;
+  for(i=0; i<hm->num_buckets; i++)
+  {
+    struct llnode* iter = hm->map[i];
+    if(strcmp(iter->word,"null")==0)
+    {
+      break;
+    }
+    else if(iter->D1count>=1 && iter->D2count>=1 && iter->D3count>=1)
+    {
+      hm_remove(hm,iter->word);
+    }
+  }
+}
 void read_query(struct hashmap *hm)
 {
     printf("Enter a string you want to search for, then press enter:\n");
     char input[256];
     scanf("\n");
     fgets(input, 256, stdin);
+    double R1 = 0;
+    double R2 = 0;
+    double R3 = 0;
     printf("You entered %s\n",input);
     char* word;
     word = strtok(input," ");
+
     while(word!=NULL)
     {
         struct llnode* ugh = hm_get(hm,word);
-	if(ugh!=NULL)
-
-	{
-       		 printf("%s",ugh->word);
+      	if(ugh!=NULL)
+      	{
+            rank(ugh, R1, R2, R3);
         }
-	word = strtok(NULL, " ");
+      	word = strtok(NULL, " ");
     }
+    if(R1+R2+R3 == 0)
+    {
+      printf("Error: none of those words are in the document");
+    }
+    else
+    {
+      sort(R1,R2,R3);
+    }
+}
+void sort(double R1, double R2, double R3)
+{
+  if(R1>=R2 && R2>=R3)
+  {
+    printf("D1.txt, D2.txt, D3.txt");
+  }
+  else if(R1>=R3 && R3>=R2)
+  {
+    printf("D1.txt, D3.txt, D2.txt");
+  }
+  else if(R2>=R1 && R1>=R3)
+  {
+    printf("D2.txt, D1.txt, D3.txt");
+  }
+  else if(R2>=R3 && R3>=R1)
+  {
+    printf("D2.txt, D3.txt, D1.txt");
+  }
+  else if(R3>=R2 && R2>=R1)
+  {
+    printf("D3.txt, D2.txt, D1.txt");
+  }
+  else
+  {
+    printf("D3.txt, D1.txt, D2.txt");
+  }
+
+}
+void rank(struct llnode* ugh, double R1, double R2, double R3)
+{
+  R1 += tf_idf(ugh,1);
+  R2 += tf_idf(ugh,2);
+  R3 += tf_idf(ugh,3);
+}
+double tf_idf(struct llnode* a, int docNum)
+{
+  double b = findInvDocFreq(a);
+  if(docNum==1)
+  {
+    return (a->D1count)*b;
+  }
+  else if(docNum == 2)
+  {
+    return (a->D2count)*b;
+  }
+  else
+  {
+    return (a->D3count)*b;
+  }
+}
+int findDocFreq(struct llnode* a)
+{
+    int numDoc=0;
+    if(a->D1count>0)
+    {
+      numDoc++;
+    }
+    if(a->D2count>0)
+    {
+      numDoc++;
+    }
+    if(a->D3count>0)
+    {
+      numDoc++;
+    }
+    return numDoc;
+}
+double findInvDocFreq(struct llnode* a)
+{
+    int numDoc=0;
+    if(a->D1count>0)
+    {
+      numDoc++;
+    }
+    if(a->D2count>0)
+    {
+      numDoc++;
+    }
+    if(a->D3count>0)
+    {
+      numDoc++;
+    }
+    return log10(3/numDoc);
 }
 int main(void)
 {
-  int numBuckets = 3;
+  printf("Enter the number of buckets you want the hashmap to have: \n");
+  int numBuckets;
+  scanf("%i", &numBuckets);
   struct hashmap *hm = hm_create(numBuckets);
   training(hm);
-  printf("putting help in bucket\n");
-  hm_put(hm,"help",1,0,1);
-  printf("putting help in bucket\n");
-  hm_put(hm,"help",1,0,1);
-  printf("putting me in bucket\n");
-  hm_put(hm,"me",1,0,1);
-  printf("putting aaaaaaa in bucket\n");
-  hm_put(hm,"aaaaaa",1,0,1);
-  struct llnode* ret = hm_get(hm,"help");
-  printf("%s %i %i %i\n",ret->word, ret->D1count, ret->D2count, ret->D3count);
-    /*printf("Enter the number of buckets you want the hashmap to have: \n");
-    int numBuckets;
-    scanf("%i", &numBuckets);
-    struct hashmap *hm = hm_create(numBuckets);
-    printf("created hashmap of size %i\n",numBuckets);
-    printf("putting help in bucket\n");
-    hm_put(hm,"help",1,0,1);
-    printf("put help in bucket, now getting help\n");
-    struct llnode* ugh = hm_get(hm,"help");
-    printf("get result- word: %s D1: %i\n", ugh->word,ugh->D1count);
-    printf("putting help in bucket\n");
-    hm_put(hm,"help",1,0,1);
-    ugh = hm_get(hm,"help");
-    printf("get result- word: %s D1: %i\n", ugh->word,ugh->D1count);
-    exit(0);
-    //training(hm);
-    while(1)
-    {
-        printf("Type S to search or X to exit, then press enter: \n");
-        char choice;
-        choice = getchar();
-        printf("You entered: ");
-        putchar(choice);
-        printf("\n");
-        if(choice == 'S'||choice == 's')
-        {
-            read_query(hm);
-        }
-        else if(choice == 'X'||choice == 'x')
-        {
-            break;
-        }
-        else
-        {
-            printf("Error: that char was invalid. \n");
-        }
-    }
-    training(hm);
-
-
-    printf("___________________________________________________________\n");
-    printf("Create the hashmap and input files:\n");
-    struct hashmap *hm = hm_create(23);
-    printf("I made a hashmap\n");
-    training(hm);
-    printf("___________________________________________________________\n");*/
+  stop_words(hm);
+  while(1)
+  {
+      printf("Type S to search or X to exit, then press enter: \n");
+      char choice;
+      choice = getchar();
+      printf("You entered: ");
+      putchar(choice);
+      printf("\n");
+      if(choice == 'S'||choice == 's')
+      {
+          read_query(hm);
+      }
+      else if(choice == 'X'||choice == 'x')
+      {
+          break;
+      }
+      else
+      {
+          printf("Error: that char was invalid. \n");
+      }
+  }
 }

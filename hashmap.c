@@ -22,7 +22,7 @@ struct llnode* hm_get(struct hashmap* hm, char* word)
   int bucket = hash(hm,word);
   struct llnode* head = hm->map[bucket];
   struct llnode* iter = head;
-  if (iter == NULL)
+  if (strcmp(iter->word,"null")==0)
   {
       return iter;//return a null node
   }
@@ -112,18 +112,18 @@ void hm_destroy(struct hashmap* hm)
 void hm_remove(struct hashmap* hm, char* word)
  {
  int bucket = hash(hm,word);
- struct llnode* headBucket = hm->map[bucket];
- if(headBucket == NULL)
+ struct llnode* deleteMe = hm_get(hm,word);
+ if(strcmp(deleteMe->word,"null")==0)
  {
      printf("key value pair not found\n");
  }
- struct llnode* trail = headBucket;
- struct llnode* iter = headBucket->next;
+ struct llnode* trail = deleteMe;
+ struct llnode* iter = deleteMe->next;
  //removing the only node in a bucket...
  if(iter == NULL && strcmp(trail->word,word)==0)
  {
      hm->map[bucket]=NULL;
-     free(headBucket);
+     free(deleteMe);
      hm->num_elements--;
      return;
  }
