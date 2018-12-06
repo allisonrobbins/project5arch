@@ -10,7 +10,7 @@ void stop_words(struct hashmap *hm);
 double findInvDocFreq(struct llnode* a);
 double tf_idf(struct llnode* a, int docNum);
 int findDocFreq(struct llnode* a);
-void rank(struct llnode* ugh, double R1, double R2, double R3);
+double rank(struct llnode* a, int docNum);
 void sort(double R1, double R2, double R3);
 void training(struct hashmap* hm)
 {
@@ -100,15 +100,17 @@ void read_query(struct hashmap *hm)
     while(word!=NULL)
     {
         struct llnode* ugh = hm_get(hm,word);
-      	if(ugh!=NULL)
+      	if(strcmp(ugh->word,"null")!=0)
       	{
-            rank(ugh, R1, R2, R3);
+            R1 += rank(ugh,1);
+            R2 += rank(ugh,2);
+            R3 += rank(ugh,3);
         }
       	word = strtok(NULL, " ");
     }
     if(R1+R2+R3 == 0)
     {
-      printf("Error: none of those words are in the document");
+      printf("Error: none of those words are in the document\n");
     }
     else
     {
@@ -119,37 +121,30 @@ void sort(double R1, double R2, double R3)
 {
   if(R1>=R2 && R2>=R3)
   {
-    printf("D1.txt, D2.txt, D3.txt");
+    printf("D1.txt, D2.txt, D3.txt\n");
   }
   else if(R1>=R3 && R3>=R2)
   {
-    printf("D1.txt, D3.txt, D2.txt");
+    printf("D1.txt, D3.txt, D2.txt\n");
   }
   else if(R2>=R1 && R1>=R3)
   {
-    printf("D2.txt, D1.txt, D3.txt");
+    printf("D2.txt, D1.txt, D3.txt\n");
   }
   else if(R2>=R3 && R3>=R1)
   {
-    printf("D2.txt, D3.txt, D1.txt");
+    printf("D2.txt, D3.txt, D1.txt\n");
   }
   else if(R3>=R2 && R2>=R1)
   {
-    printf("D3.txt, D2.txt, D1.txt");
+    printf("D3.txt, D2.txt, D1.txt\n");
   }
   else
   {
-    printf("D3.txt, D1.txt, D2.txt");
+    printf("D3.txt, D1.txt, D2.txt\n");
   }
-
 }
-void rank(struct llnode* ugh, double R1, double R2, double R3)
-{
-  R1 += tf_idf(ugh,1);
-  R2 += tf_idf(ugh,2);
-  R3 += tf_idf(ugh,3);
-}
-double tf_idf(struct llnode* a, int docNum)
+double rank(struct llnode* a, int docNum)
 {
   double b = findInvDocFreq(a);
   if(docNum==1)
@@ -228,4 +223,5 @@ int main(void)
           printf("Error: that char was invalid. \n");
       }
   }
+  hm_destroy(hm);
 }
