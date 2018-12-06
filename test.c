@@ -9,7 +9,6 @@ void read_query(struct hashmap *hm);
 void stop_words(struct hashmap *hm);
 double findInvDocFreq(struct llnode* a);
 double tf_idf(struct llnode* a, int docNum);
-int findDocFreq(struct llnode* a);
 double rank(struct llnode* a, int docNum);
 void sort(double R1, double R2, double R3);
 void training(struct hashmap* hm)
@@ -71,54 +70,54 @@ void training(struct hashmap* hm)
 void stop_words(struct hashmap *hm)
 {
   int i;
-  for(i=0; i<hm->num_buckets; i++)
+  for(i=0; i<hm->num_buckets; i++)//go through each bucket
   {
     struct llnode* iter = hm->map[i];
-    if(strcmp(iter->word,"null")==0)
+    if(strcmp(iter->word,"null")==0)//tet if the first node is null if it is then go to next bucket
     {
       break;
     }
-    else if(iter->D1count>=1 && iter->D2count>=1 && iter->D3count>=1)
-    {
-      hm_remove(hm,iter->word);
+    else if(iter->D1count>0 && iter->D2count>0 && iter->D3count>0)
+    {//see if the word is in all documents, aka the counter for that document is positive
+      hm_remove(hm,iter->word);//if a stop word, then delete that node
     }
   }
 }
 void read_query(struct hashmap *hm)
-{
+{//this method reads in a string from the user and computes the result
     printf("Enter a string you want to search for, then press enter:\n");
     char input[256];
-    scanf("\n");
+    scanf("\n");//search query ends when the user presses enter
     fgets(input, 256, stdin);
-    double R1 = 0;
+    double R1 = 0;//these are the tallies of the tf_idf for each document
     double R2 = 0;
     double R3 = 0;
-    printf("You entered %s\n",input);
     char* word;
-    word = strtok(input," ");
+    word = strtok(input," ");//reading one word at a time
 
-    while(word!=NULL)
+    while(word!=NULL)//keep going until the end of the search query
     {
-        struct llnode* ugh = hm_get(hm,word);
-      	if(strcmp(ugh->word,"null")!=0)
+        struct llnode* input = hm_get(hm,word);//get the corresponding llnode to the word
+      	if(strcmp(input->word,word)==0)//double check that it is the right node
       	{
-            R1 += rank(ugh,1);
-            R2 += rank(ugh,2);
-            R3 += rank(ugh,3);
+            R1 += rank(input,1);//increment the tf_idf count for this word
+            R2 += rank(input,2);
+            R3 += rank(input,3);
         }
-      	word = strtok(NULL, " ");
-    }
-    if(R1+R2+R3 == 0)
+      	word = strtok(NULL, " ");//move to next word
+    }//after all words have been added to the tf_idf
+    if(R1+R2+R3 == 0)//if the total sum is 0, then there are no matches in the hashmap
     {
       printf("Error: none of those words are in the document\n");
     }
-    else
+    else//now that all the tf_idf counts are up to date, sort and print to console
     {
-      sort(R1,R2,R3);
+      sort(R1,R2,R3);//call sort method
     }
 }
 void sort(double R1, double R2, double R3)
-{
+{//This method sorts the documents in order of relevance and then prints them to the console in that order
+  //instead of using a sorting algorithm, because it is only 3 documents, I used cascading if/else statements
   if(R1>=R2 && R2>=R3)
   {
     printf("D1.txt, D2.txt, D3.txt\n");
@@ -146,8 +145,8 @@ void sort(double R1, double R2, double R3)
 }
 double rank(struct llnode* a, int docNum)
 {
-  double b = findInvDocFreq(a);
-  if(docNum==1)
+  double b = findInvDocFreq(a);//the inverse document frequency is the same no matter which specific document we are looking for
+  if(docNum==1)//now, multiply idf by the corresponding count for the specific document and return that value
   {
     return (a->D1count)*b;
   }
@@ -160,27 +159,10 @@ double rank(struct llnode* a, int docNum)
     return (a->D3count)*b;
   }
 }
-int findDocFreq(struct llnode* a)
-{
-    int numDoc=0;
-    if(a->D1count>0)
-    {
-      numDoc++;
-    }
-    if(a->D2count>0)
-    {
-      numDoc++;
-    }
-    if(a->D3count>0)
-    {
-      numDoc++;
-    }
-    return numDoc;
-}
 double findInvDocFreq(struct llnode* a)
 {
-    int numDoc=0;
-    if(a->D1count>0)
+    int numDoc=0;//counter for which documents the word appears
+    if(a->D1count>0)//test each document counter for the node
     {
       numDoc++;
     }
@@ -192,7 +174,7 @@ double findInvDocFreq(struct llnode* a)
     {
       numDoc++;
     }
-    return log10(3/numDoc);
+    return log10(3/numDoc);//using math.h to compute the log of 3/document frequency
 }
 int main(void)
 {
@@ -203,25 +185,25 @@ int main(void)
   training(hm);
   stop_words(hm);
   while(1)
-  {
+  {//for some reason, it doesn't wait for user input the first time, but then it works right the rest of the time
       printf("Type S to search or X to exit, then press enter: \n");
       char choice;
       choice = getchar();
       printf("You entered: ");
       putchar(choice);
       printf("\n");
-      if(choice == 'S'||choice == 's')
+      if(choice == 'S'||choice == 's')//case insensitive!!!
       {
-          read_query(hm);
+          read_query(hm);//go to corresponding method
       }
-      else if(choice == 'X'||choice == 'x')
+      else if(choice == 'X'||choice == 'x')//wow also case insensitive
       {
-          break;
+          break;//break out of while loop to end program
       }
       else
       {
-          printf("Error: that char was invalid. \n");
+          printf("Error: that char was invalid. \n");//if not one of those chars, prompts for input again
       }
   }
-  hm_destroy(hm);
+  hm_destroy(hm);//when while loop is over, destroy the hashmap
 }

@@ -3,111 +3,114 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct hashmap* hm_create(int num_buckets)
+struct hashmap* hm_create(int num_buckets)//this method creates the hashmap!
 {
-    struct hashmap* hm = (struct hashmap*)malloc(sizeof(struct hashmap));
-    hm->map = (struct llnode**)malloc(sizeof(struct llnode*)*num_buckets);
+    struct hashmap* hm = (struct hashmap*)malloc(sizeof(struct hashmap));//first, alocate for the hashmap struct
+    hm->map = (struct llnode**)malloc(sizeof(struct llnode*)*num_buckets);//next, allocate map for number of buckets
     int i;
-    for(i=0; i<num_buckets; i++)
+    for(i=0; i<num_buckets; i++)//iterate through map
     {
-      hm->map[i] = (struct llnode*)malloc(sizeof(struct llnode));
+      hm->map[i] = (struct llnode*)malloc(sizeof(struct llnode));//allocate for each llnode
       hm->map[i]->word = "null";
+      /*so I was getting a lot of weird errors when trying to find null buckets, so I initialized the head of each
+      bucket to have the head's word be "null" and that made it easier to test for a null node*/
     }
-    hm->num_buckets = num_buckets;
-    hm->num_elements = 0;
+    hm->num_buckets = num_buckets;//set these variables
+    hm->num_elements = 0;//nothings there yet
     return hm;
 }
 struct llnode* hm_get(struct hashmap* hm, char* word)
 {
-  int bucket = hash(hm,word);
+  int bucket = hash(hm,word);//find which bucket this node should be in
   struct llnode* head = hm->map[bucket];
   struct llnode* iter = head;
-  if (strcmp(iter->word,"null")==0)
+  if (strcmp(iter->word,"null")==0)//if the head of the bucket is null, then the word is not in the hashmap
   {
       return iter;//return a null node
   }
-  if(strcmp(iter->word, word)==0)
+  if(strcmp(iter->word, word)==0)//if the word matches the one we are looking for, then return that node
   {
       return iter;
   }
-  else
+  while(iter->next!=NULL)
   {
-      return iter;//head is null, so if the word is not found, return a null node
+    if(strcmp(iter->word, word)==0)//if the word matches the one we are looking for, then return that node
+    {
+        return iter;
+    }
+    iter = iter->next;//iterate through linked list
   }
+      return iter;//that word is not in the hashmap so return whatever node we are at
 }
-  void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)
+  void hm_put(struct hashmap* hm, char* word, int D1, int D2, int D3)//putting a word in the hashmap!
 	{
-	    int bucket = hash(hm,word);
-	    struct llnode* test = hm->map[bucket];
-	    if(strcmp(test->word,"null")==0)
+	    int bucket = hash(hm,word);//find which bucket the node should go in
+	    struct llnode* iter = hm->map[bucket];
+	    if(strcmp(iter->word,"null")==0)//if the head of the bucket is null, put the word in there
 	    {
-	      test->word = word;
-	      test->D1count = D1;
-	      test->D2count = D2;
-	      test->D3count = D3;
-	      test->next = NULL;
+	      iter->word = word;
+	      iter->D1count = D1;
+	      iter->D2count = D2;
+	      iter->D3count = D3;
+	      iter->next = NULL;
 	      hm->num_elements++;
 	      return;
 	    }
-	    while(test->word!=NULL)
+	    while(iter->word!=NULL)//otherwise, iterate through the list and look for a match
 	    {
-	        if(strcmp(test->word, word)==0)
+	        if(strcmp(iter->word, word)==0)//if that is the right word...
 	        {
-	          test->D1count += D1;
-	          test->D2count += D2;
-	          test->D3count += D3;
+	          iter->D1count += D1;//increment document counters
+	          iter->D2count += D2;
+	          iter->D3count += D3;
 	          return;
 	        }
-	        if(test->next == NULL)
+	        if(iter->next == NULL)//if nothing comes next, then add a node after
 	        {
-	          test->next=(struct llnode*)malloc(sizeof(struct llnode));
-	          test = test->next;
-	          test->word = word;
-	          test->D1count = D1;
-	          test->D2count = D2;
-            test->D3count = D3;
-	          test->next = NULL;
-	          hm->num_elements++;
+	          iter->next=(struct llnode*)malloc(sizeof(struct llnode));//need to allocate memory for the node
+	          iter = iter->next;
+	          iter->word = word;//set all the values
+	          iter->D1count = D1;
+	          iter->D2count = D2;
+            iter->D3count = D3;
+	          iter->next = NULL;
+	          hm->num_elements++;//increment this
 	          return;
 	        }
-	        test = test->next;
+	        iter = iter->next;//otherwise, iterate
 	    }
 	}
-int hash(struct hashmap* hm, char* word)
+int hash(struct hashmap* hm, char* word)//find which bucket it should be in
 {
     char* a;
     int i;
     int sum = 0;
-    for(a = word; *a!='\0'; a++)
+    for(a = word; *a!='\0'; a++)//iterate through chars 1 by 1
     {
-        i = (int) *a;
-        sum = sum + i;
+        i = (int) *a;//convert to ascii
+        sum = sum + i;//add to sum
     }
-    sum = sum%hm->num_buckets;
+    sum = sum%hm->num_buckets;//using the hash function given
     return sum;
 }
-void hm_destroy(struct hashmap* hm)
+void hm_destroy(struct hashmap* hm)//iterates through hashmap and destroys everything
 {
     int i;
-    for(i=0; i<hm->num_buckets; i++)
+    for(i=0; i<hm->num_buckets; i++)//goes to every bucket
     {
         printf("destroying bucket %i\n",i);
         struct llnode* trail;
         struct llnode* iter = hm->map[i];
-        while(iter != NULL && iter !=0)
+        while(iter != NULL && iter !=0)//iterate through and free all nodes
         {
             trail = iter;
             iter = iter->next;
             free(trail);
         }
-        if(iter == NULL)
-        {
-            printf("iter is null\n");
-        }
     }
-    printf("destroying map and hm");
-    free(hm->map);
-    free(hm);
+    printf("destroying map and hm\n");
+    free(hm->map);//now, free map pointer
+    free(hm);//free hashmap pointer
 }
 void hm_remove(struct hashmap* hm, char* word)
  {
